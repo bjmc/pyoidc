@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import string
 
 # Since SystemRandom is not available on all systems
@@ -7,8 +8,15 @@ try:
 except ImportError:
     import random as rnd
 
+from .logger_filter import sanitizing_filter
+
+
 __author__ = 'rohe0002'
 __version__ = '0.9.1.0'
+
+
+PYOIDC_ROOT_LOGGER = logging.getLogger(__name__)
+PYOIDC_ROOT_LOGGER.addFilter(sanitizing_filter)
 
 
 OIDCONF_PATTERN = "%s/.well-known/openid-configuration"
