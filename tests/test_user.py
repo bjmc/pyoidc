@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring,redefined-outer-name,no-self-use
+import logging
 import os
 import pytest
 
@@ -6,6 +7,7 @@ from future.backports.urllib.parse import urlencode
 from future.backports.urllib.parse import parse_qs
 
 from mako.lookup import TemplateLookup
+from testfixtures import LogCapture
 
 from oic import rndstr
 from oic.utils.authn.user import UsernamePasswordMako
@@ -75,12 +77,23 @@ class TestUsernamePasswordMako(object):
 
         authn = UsernamePasswordMako(srv, "login.mako", tl, PASSWD,
                                      "authorization_endpoint")
-        response, success = authn.verify(parse_qs(form))
+        with LogCapture(level=logging.DEBUG) as logcap:
+            response, success = authn.verify(parse_qs(form))
         assert query_string_compare(response.message.split("?")[1],
                                     "query=foo&upm_answer=true")
 
         headers = dict(response.headers)
         assert headers["Set-Cookie"].startswith('xyzxyz=')
+        logcap.check(
+            ('oic.utils.authn.user', 'DEBUG', ("verify({'query': "
+            "[u'query=foo'], 'login': ['user'], 'password': '<REDACTED>'})")),
+            ('oic.utils.authn.user', 'DEBUG', ("dict: {'query': "
+            "[u'query=foo'], 'login': ['user'], 'password': '<REDACTED>'}")),
+            ('oic.utils.authn.user', 'DEBUG',
+             'Password verification succeeded.'),
+            ('oic.utils.authn.user', 'DEBUG',
+             "kwargs: {u'query': [u'foo'], 'upm_answer': 'true'}")
+        )
 
     def test_not_authenticated(self, srv):
         form = create_return_form_env("user", "hemligt", "QUERY")
