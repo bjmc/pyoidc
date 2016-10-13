@@ -385,6 +385,11 @@ class KeyJar(object):
         self.verify_ssl = verify_ssl
         self.keybundle_cls = keybundle_cls
 
+    def __repr__(self):
+        issuers = self.issuer_keys.keys()
+        return '<KeyJar(issuers={})>'.format(issuers)
+
+
     def add_if_unique(self, issuer, use, keys):
         if use in self.issuer_keys[issuer] and self.issuer_keys[issuer][use]:
             for typ, key in keys:

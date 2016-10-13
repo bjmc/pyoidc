@@ -85,10 +85,10 @@ class TestUsernamePasswordMako(object):
         headers = dict(response.headers)
         assert headers["Set-Cookie"].startswith('xyzxyz=')
         logcap.check(
-            ('oic.utils.authn.user', 'DEBUG', ("verify({'query': "
-            "[u'query=foo'], 'login': ['user'], 'password': '<REDACTED>'})")),
-            ('oic.utils.authn.user', 'DEBUG', ("dict: {'query': "
-            "[u'query=foo'], 'login': ['user'], 'password': '<REDACTED>'}")),
+            ('oic.utils.authn.user', 'DEBUG', ("verify({u'query': "
+            "[u'query=foo'], u'login': ['user'], u'password': '<REDACTED>'})")),
+            ('oic.utils.authn.user', 'DEBUG', ("dict: {u'query': "
+            "[u'query=foo'], u'login': ['user'], u'password': '<REDACTED>'}")),
             ('oic.utils.authn.user', 'DEBUG',
              'Password verification succeeded.'),
             ('oic.utils.authn.user', 'DEBUG',

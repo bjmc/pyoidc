@@ -798,7 +798,7 @@ class Provider(object):
 
         logger.debug("- token -")
         body = kwargs["request"]
-        logger.debug("body: %s" % body)
+        logger.debug("body: %s" % sanitize(body))
 
         areq = AccessTokenRequest().deserialize(body, "urlencoded")
 

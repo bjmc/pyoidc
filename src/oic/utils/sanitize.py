@@ -23,7 +23,7 @@ SANITIZE_PATTERN = r'''( # Start of capturing group--we'll keep this bit.
                            [ub]? # Python 2/3
                            [\"']? # Might be a quote here.
                        ) # End of capturing group
-                       (?:[%\w]+) # This is the bit we replace with '<REDACTED>'
+                       (?:[%=/+\w]+) # This is the bit we replace with '<REDACTED>'
                     '''
 SANITIZE_PATTERN = dedent(SANITIZE_PATTERN.format('|'.join(SENSITIVE_THINGS)))
 SANITIZE_REGEX = re.compile(SANITIZE_PATTERN, re.VERBOSE|re.IGNORECASE)
