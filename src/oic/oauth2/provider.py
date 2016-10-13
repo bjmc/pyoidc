@@ -456,7 +456,8 @@ class Provider(object):
                 return self._error("invalid_request",
                                    "Trying to use unregistered response_typ")
 
-        logger.debug("AuthzRequest: %s" % (areq.to_dict(),))
+
+        logger.debug("AuthzRequest: %s" % (sanitize(areq.to_dict()),))
         try:
             redirect_uri = self.get_redirect_uri(areq)
         except (RedirectURIError, ParameterError, UnknownClient) as err:

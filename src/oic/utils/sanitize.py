@@ -4,27 +4,30 @@ import re
 
 
 SENSITIVE_THINGS = ('password', 'passwd', 'client_secret', 'code',
-                    'authorization', 'authorization_code', 'access_token',
-                    'refresh_token')
+                    'authorization', 'access_token', 'refresh_token')
 
 
 REPLACEMENT = '<REDACTED>'
 
 
-SANITIZE_PATTERN = r'''( # Start of capturing group--we'll keep this bit.
-                            (?: # non-capturing group
-                                {} # Template-in things we want to sanitize
-                            ) #
-                           ['\"]? # Might have a quote after them?
-                           \s* # Maybe some whitespace
-                           [=:,] # Probably a : , or = in tuple, dict or qs format
-                           \s* # Maybe more whitespace
-                           [([]? # Could be inside a list/tuple, parse_qs?
-                           [ub]? # Python 2/3
-                           [\"']? # Might be a quote here.
-                       ) # End of capturing group
-                       (?:[%=/+\w]+) # This is the bit we replace with '<REDACTED>'
-                    '''
+SANITIZE_PATTERN = r'''
+    (?<!_) # Negative-lookbehind for underscore.
+    # Necessary to keep 'authorization_code' from matching 'code'
+    ( # Start of capturing group--we'll keep this bit.
+         (?: # non-capturing group
+             {} # Template-in things we want to sanitize
+         ) #
+        ['\"]? # Might have a quote after them?
+        \s* # Maybe some whitespace
+        [=:,] # Probably a : , or = in tuple, dict or qs format
+        \s* # Maybe more whitespace
+        [([]? # Could be inside a list/tuple, parse_qs?
+        [ub]? # Python 2/3
+        [\"']? # Might be a quote here.
+    ) # End of capturing group
+    (?:[%=/+\w]+) # This is the bit we replace with '<REDACTED>'
+'''
+
 SANITIZE_PATTERN = dedent(SANITIZE_PATTERN.format('|'.join(SENSITIVE_THINGS)))
 SANITIZE_REGEX = re.compile(SANITIZE_PATTERN, re.VERBOSE|re.IGNORECASE)
 

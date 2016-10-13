@@ -84,16 +84,15 @@ class TestUsernamePasswordMako(object):
 
         headers = dict(response.headers)
         assert headers["Set-Cookie"].startswith('xyzxyz=')
-        logcap.check(
-            ('oic.utils.authn.user', 'DEBUG', ("verify({u'query': "
-            "[u'query=foo'], u'login': ['user'], u'password': '<REDACTED>'})")),
-            ('oic.utils.authn.user', 'DEBUG', ("dict: {u'query': "
-            "[u'query=foo'], u'login': ['user'], u'password': '<REDACTED>'}")),
-            ('oic.utils.authn.user', 'DEBUG',
-             'Password verification succeeded.'),
-            ('oic.utils.authn.user', 'DEBUG',
-             "kwargs: {u'query': [u'foo'], 'upm_answer': 'true'}")
-        )
+        expected = {u'query': [u'query=foo'], u'login': ['user'], u'password': '<REDACTED>'}
+        # We have to use eval() here to avoid intermittent
+        # failures from dict ordering
+        assert eval(logcap.records[0].msg[7:-1]) == expected
+        expected = {u'query': [u'query=foo'], u'login': ['user'], u'password': '<REDACTED>'}
+        assert eval(logcap.records[1].msg[5:]) == expected
+        assert logcap.records[2].msg == 'Password verification succeeded.'
+        expected = {u'query': [u'foo'], 'upm_answer': 'true'}
+        assert eval(logcap.records[3].msg[8:]) == expected
 
     def test_not_authenticated(self, srv):
         form = create_return_form_env("user", "hemligt", "QUERY")
